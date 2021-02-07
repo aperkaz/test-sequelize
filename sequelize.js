@@ -15,11 +15,11 @@
     const User = sequelize.define(
       "User",
       {
-        id: {
-          type: DataTypes.NUMBER,
-          primaryKey: true,
-          allowNull: false,
-        },
+        // id: {
+        //   type: DataTypes.NUMBER,
+        //   primaryKey: true,
+        //   allowNull: false,
+        // },
         firstName: {
           type: DataTypes.STRING,
           allowNull: false,
@@ -35,24 +35,32 @@
     sequelize.sync();
 
     // create and save model instance in DB
-    const jane = User.build({ id: 1, firstName: "Jane", lastName: "Doe" });
+    const jane = User.build({ firstName: "Jane", lastName: "Doe" });
     await jane.save();
 
-    const jeff = await User.create({
-      id: 2,
-      firstName: "Jeff",
-      lastName: "TheBoss",
-    });
+    console.time("create");
+    for (var i = 0; i < 1000; i++) {
+      await User.create({
+        firstName: "Jeff",
+        lastName: "TheBoss",
+      });
+    }
 
-    const pep = await User.create({
-      id: 3,
-      firstName: "Pep",
-      lastName: "Bezos",
-    });
+    console.timeEnd("create");
 
+    console.time("find");
     const users = await User.findAll();
-    console.log(users[0].id === jane.id);
-    console.log(JSON.stringify(users, null, 2));
+    console.timeEnd("find");
+
+    console.time("find2");
+    const usersFiltered = await User.findAll({
+      where: {
+        firstName: "Alain",
+      },
+    });
+    console.timeEnd("find2");
+
+    // console.log(JSON.stringify(users, null, 2));
 
     // migrations: https://sequelize.org/master/manual/migrations.html
   } catch (error) {
